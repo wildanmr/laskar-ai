@@ -67,8 +67,8 @@ df_raw.head(3)
 Dataset yang digunakan dalam proyek ini adalah "Beijing Multisite Air Quality Data" yang berisi data kualitas udara dan meteorologi dari berbagai stasiun di Beijing. Dataset ini mencakup observasi per jam dari tahun 2013 hingga 2017.
 
 ### Informasi Dataset
-* **Dataset:** Beijing Multi-Site Air-Quality Data<br>
-* **URL:** https://www.kaggle.com/api/v1/datasets/download/aravindpcoder/beijing-multi-site-air-quality-data<br>
+*   **Dataset:** Beijing Multi-Site Air-Quality Data<br>
+*   **URL:** https://www.kaggle.com/datasets/aravindpcoder/beijing-multi-site-air-quality-data<br>
 *   **Jumlah Sampel:** 420,768 entri.
 *   **Kolom:** 17 kolom, termasuk informasi waktu (tahun, bulan, hari, jam), konsentrasi polutan (PM2.5, PM10, SO2, NO2, CO, O3), data meteorologi (TEMP, PRES, DEWP, RAIN, wd, WSPM), dan nama stasiun.
 *   **Tipe Data:** Campuran `int64`, `float64`, dan `object` (untuk `wd` dan `station`).
@@ -233,12 +233,12 @@ Evaluasi model dilakukan berdasarkan metrik Root Mean Squared Error (RMSE) dan R
 *   R2 Score: 0.8453
 
 **Random Forest:**
-*   RMSE: 18.0846
-*   R2 Score: 0.9496
+*   RMSE: 18.0848
+*   R2 Score: 0.9495
 
 ### Perbandingan dan Pemilihan Model:
 
-Dari hasil di atas, terlihat jelas bahwa model **Random Forest** menunjukkan kinerja yang jauh lebih unggul dibandingkan dengan model Regresi Linear. RMSE Random Forest (18.0846) secara signifikan lebih rendah daripada RMSE Regresi Linear (31.6726), menunjukkan bahwa prediksi Random Forest memiliki kesalahan rata-rata yang lebih kecil. Selain itu, R2 Score Random Forest (0.9496) jauh lebih tinggi daripada Regresi Linear (0.8453), yang berarti model Random Forest mampu menjelaskan hampir 95% variabilitas dalam kadar PM2.5, dibandingkan dengan sekitar 84.5% oleh Regresi Linear.
+Dari hasil di atas, terlihat jelas bahwa model **Random Forest** menunjukkan kinerja yang jauh lebih unggul dibandingkan dengan model Regresi Linear. RMSE Random Forest (18.0848) secara signifikan lebih rendah daripada RMSE Regresi Linear (31.6726), menunjukkan bahwa prediksi Random Forest memiliki kesalahan rata-rata yang lebih kecil. Selain itu, R2 Score Random Forest (0.9495) jauh lebih tinggi daripada Regresi Linear (0.8453), yang berarti model Random Forest mampu menjelaskan hampir 95% variabilitas dalam kadar PM2.5, dibandingkan dengan sekitar 84.5% oleh Regresi Linear.
 
 Berdasarkan perbandingan ini, **model Random Forest dipilih sebagai model terbaik** untuk memprediksi kadar PM2.5 di Beijing di antara model-model yang berhasil dilatih.
 """
