@@ -233,12 +233,12 @@ Evaluasi model dilakukan berdasarkan metrik Root Mean Squared Error (RMSE) dan R
 *   R2 Score: 0.8453
 
 **Random Forest:**
-*   RMSE: 18.0846
-*   R2 Score: 0.9496
+*   RMSE: 18.0848
+*   R2 Score: 0.9495
 
 ### Perbandingan dan Pemilihan Model:
 
-Dari hasil di atas, terlihat jelas bahwa model **Random Forest** menunjukkan kinerja yang jauh lebih unggul dibandingkan dengan model Regresi Linear. RMSE Random Forest (18.0846) secara signifikan lebih rendah daripada RMSE Regresi Linear (31.6726), menunjukkan bahwa prediksi Random Forest memiliki kesalahan rata-rata yang lebih kecil. Selain itu, R2 Score Random Forest (0.9496) jauh lebih tinggi daripada Regresi Linear (0.8453), yang berarti model Random Forest mampu menjelaskan hampir 95% variabilitas dalam kadar PM2.5, dibandingkan dengan sekitar 84.5% oleh Regresi Linear.
+Dari hasil di atas, terlihat jelas bahwa model **Random Forest** menunjukkan kinerja yang jauh lebih unggul dibandingkan dengan model Regresi Linear. RMSE Random Forest (18.0848) secara signifikan lebih rendah daripada RMSE Regresi Linear (31.6726), menunjukkan bahwa prediksi Random Forest memiliki kesalahan rata-rata yang lebih kecil. Selain itu, R2 Score Random Forest (0.9495) jauh lebih tinggi daripada Regresi Linear (0.8453), yang berarti model Random Forest mampu menjelaskan hampir 95% variabilitas dalam kadar PM2.5, dibandingkan dengan sekitar 84.5% oleh Regresi Linear.
 
 Berdasarkan perbandingan ini, **model Random Forest dipilih sebagai model terbaik** untuk memprediksi kadar PM2.5 di Beijing di antara model-model yang berhasil dilatih.
 """
