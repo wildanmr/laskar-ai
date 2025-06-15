@@ -47,7 +47,7 @@ Dataset yang digunakan dalam proyek ini adalah "Beijing Multisite Air Quality Da
 
 ### Informasi Dataset
 *   **Dataset:** Beijing Multi-Site Air-Quality Data
-*   **URL:** https://www.kaggle.com/api/v1/datasets/download/aravindpcoder/beijing-multi-site-air-quality-data
+*   **URL:** https://www.kaggle.com/datasets/aravindpcoder/beijing-multi-site-air-quality-data
 *   **Jumlah Sampel:** 420,768 entri.
 *   **Kolom:** 17 kolom, termasuk informasi waktu (tahun, bulan, hari, jam), konsentrasi polutan (PM2.5, PM10, SO2, NO2, CO, O3), data meteorologi (TEMP, PRES, DEWP, RAIN, wd, WSPM), dan nama stasiun.
 *   **Tipe Data:** Campuran `int64`, `float64`, dan `object` (untuk `wd` dan `station`).
