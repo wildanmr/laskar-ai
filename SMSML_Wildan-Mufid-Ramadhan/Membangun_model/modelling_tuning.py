@@ -18,7 +18,7 @@ warnings.filterwarnings('ignore')
 def setup_dagshub_mlflow():
     """Setup DagsHub and MLflow with proper authentication"""
     try:
-        # Initialize DagsHub - make sure you're authenticated
+        # Initialize DagsHub
         dagshub.init(repo_owner="wildanmr", repo_name="SMSML_Wildan-Mufid-Ramadhan", mlflow=True)
         
         # Set tracking URI
