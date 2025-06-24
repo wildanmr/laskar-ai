@@ -224,7 +224,7 @@ def train_basic_model(experiment_id):
             # Log model without registering to avoid duplicates
             mlflow.sklearn.log_model(
                 sk_model=model,
-                name="random_forest_model",
+                artifact_path="random_forest_model",
                 input_example=input_example
             )
             print("✅ Random Forest model logged to MLflow")
@@ -325,7 +325,7 @@ def train_logistic_regression(experiment_id):
             # Log model without registering to avoid duplicates
             mlflow.sklearn.log_model(
                 sk_model=model,
-                name="logistic_regression_model",
+                artifact_path="logistic_regression_model",
                 input_example=input_example
             )
             print("✅ Logistic Regression model logged to MLflow")
