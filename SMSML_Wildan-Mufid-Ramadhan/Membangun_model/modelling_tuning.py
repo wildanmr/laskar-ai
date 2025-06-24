@@ -107,7 +107,7 @@ def calculate_additional_metrics(y_true, y_pred, y_pred_proba=None):
     metrics['recall_weighted'] = recall_score(y_true, y_pred, average='weighted', zero_division=0)
     metrics['f1_weighted'] = f1_score(y_true, y_pred, average='weighted', zero_division=0)
     
-    # Additional metrics
+    # Additional metrics for Advance (4 pts)
     metrics['precision_macro'] = precision_score(y_true, y_pred, average='macro', zero_division=0)
     metrics['recall_macro'] = recall_score(y_true, y_pred, average='macro', zero_division=0)
     metrics['f1_macro'] = f1_score(y_true, y_pred, average='macro', zero_division=0)
@@ -197,8 +197,95 @@ def create_feature_importance_plot(model, feature_names=None, model_name="Model"
         print(f"Warning: Could not create feature importance plot: {e}")
     return None
 
+def save_model_locally(model, model_name="random_forest"):
+    """Save model locally with timestamp"""
+    try:
+        os.makedirs('saved_models', exist_ok=True)
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        model_filename = f'saved_models/{model_name}_model_{timestamp}.pkl'
+        joblib.dump(model, model_filename)
+        print(f"✅ Model saved locally to: {model_filename}")
+        return model_filename
+    except Exception as e:
+        print(f"❌ Error saving model locally: {e}")
+        return None
+
+def log_model_safely(model, X_train, use_dagshub=True):
+    """Safely log model to MLflow with multiple fallback strategies"""
+    model_logged = False
+    model_path = None
+    
+    # Strategy 1: Try standard mlflow.sklearn.log_model
+    if not model_logged:
+        try:
+            print("🔄 Attempting to log model with standard MLflow method...")
+            input_example = X_train.head(1) if hasattr(X_train, 'head') else X_train[:1]
+            
+            model_info = mlflow.sklearn.log_model(
+                sk_model=model,
+                artifact_path="best_model",
+                input_example=input_example,
+                registered_model_name=None
+            )
+            print(f"✅ Model logged successfully with standard method!")
+            print(f"   Model URI: {model_info.model_uri}")
+            model_logged = True
+            model_path = model_info.model_uri
+            
+        except Exception as e:
+            print(f"⚠️  Standard model logging failed: {e}")
+    
+    # Strategy 2: Try logging without input_example
+    if not model_logged:
+        try:
+            print("🔄 Attempting to log model without input_example...")
+            model_info = mlflow.sklearn.log_model(
+                sk_model=model,
+                artifact_path="best_model",
+                registered_model_name=None
+            )
+            print(f"✅ Model logged successfully without input_example!")
+            print(f"   Model URI: {model_info.model_uri}")
+            model_logged = True
+            model_path = model_info.model_uri
+            
+        except Exception as e:
+            print(f"⚠️  Model logging without input_example failed: {e}")
+    
+    # Strategy 3: Try using pickle format
+    if not model_logged:
+        try:
+            print("🔄 Attempting to log model as pickle artifact...")
+            
+            # Save model temporarily as pickle
+            temp_model_path = "best_model.pkl"
+            joblib.dump(model, temp_model_path)
+            
+            # Log as artifact
+            mlflow.log_artifact(temp_model_path, "model")
+            
+            # Clean up temp file
+            if os.path.exists(temp_model_path):
+                os.remove(temp_model_path)
+            
+            print("✅ Model logged as pickle artifact!")
+            model_logged = True
+            
+        except Exception as e:
+            print(f"⚠️  Pickle artifact logging failed: {e}")
+    
+    # Strategy 4: Save locally only
+    if not model_logged:
+        print("🔄 All MLflow model logging methods failed, saving locally only...")
+        local_path = save_model_locally(model, "advanced_random_forest")
+        if local_path:
+            print("✅ Model saved locally as fallback")
+            model_path = local_path
+    
+    return model_logged, model_path
+
 def train_model_with_tuning(use_dagshub=True):
-    """Train model with hyperparameter tuning and manual logging"""
+    """Train model with hyperparameter tuning and robust model logging"""
     
     try:
         # Setup tracking - try DagsHub first, fallback to local
@@ -323,29 +410,20 @@ def train_model_with_tuning(use_dagshub=True):
             except Exception as e:
                 print(f"Warning: Could not create/log classification report: {e}")
             
-            # Log model - Single model only, no registration to avoid duplicates
+            # Log model with multiple fallback strategies
             print("🔄 Logging model to MLflow...")
-            try:
-                input_example = X_train.head(1) if hasattr(X_train, 'head') else X_train[:1]
-                
-                model_info = mlflow.sklearn.log_model(
-                    sk_model=best_model,
-                    name="advanced_random_forest_model",
-                    input_example=input_example
-                )
-                print(f"✅ Model logged successfully to MLflow!")
-                print(f"   Model URI: {model_info.model_uri}")
-                
-            except Exception as e:
-                print(f"❌ Error logging model to MLflow: {e}")
-                
-                # Fallback: save locally
-                print("🔄 Saving model locally as fallback...")
-                os.makedirs('saved_models', exist_ok=True)
-                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-                model_filename = f'saved_models/best_random_forest_model_{timestamp}.pkl'
-                joblib.dump(best_model, model_filename)
-                print(f"✅ Model saved locally to: {model_filename}")
+            model_logged, model_path = log_model_safely(best_model, X_train, use_dagshub)
+            
+            if not model_logged:
+                print("❌ All model logging strategies failed!")
+                # Save locally as final fallback
+                local_path = save_model_locally(best_model, "final_fallback_random_forest")
+                if local_path:
+                    model_path = local_path
+            
+            # Log model path as a parameter for reference
+            if model_path:
+                mlflow.log_param("model_save_path", model_path)
             
             # Print summary
             print("\n" + "="*60)
@@ -355,6 +433,8 @@ def train_model_with_tuning(use_dagshub=True):
             print(f"Best cross-validation score: {grid_search.best_score_:.4f}")
             print(f"Test accuracy: {metrics['accuracy']:.4f}")
             print(f"MLflow Run ID: {run.info.run_id}")
+            if model_path:
+                print(f"Model saved at: {model_path}")
             
             # Check if we can get experiment info
             try:
