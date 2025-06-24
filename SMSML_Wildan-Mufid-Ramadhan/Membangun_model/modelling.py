@@ -224,7 +224,7 @@ def train_basic_model(experiment_id):
             # Log model without registering to avoid duplicates
             mlflow.sklearn.log_model(
                 sk_model=model,
-                name="random_forest_model",
+                name="basic_random_forest_model",
                 input_example=input_example
             )
             print("✅ Random Forest model logged to MLflow")
@@ -239,7 +239,7 @@ def train_basic_model(experiment_id):
         # Save model to local file
         os.makedirs('saved_models', exist_ok=True)
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        model_filename = f'saved_models/random_forest_model_{timestamp}.pkl'
+        model_filename = f'saved_models/basic_random_forest_model_{timestamp}.pkl'
         
         joblib.dump(model, model_filename)
         print(f"✅ Model saved locally to: {model_filename}")
@@ -325,7 +325,7 @@ def train_logistic_regression(experiment_id):
             # Log model without registering to avoid duplicates
             mlflow.sklearn.log_model(
                 sk_model=model,
-                name="logistic_regression_model",
+                name="basic_logistic_regression_model",
                 input_example=input_example
             )
             print("✅ Logistic Regression model logged to MLflow")
@@ -340,7 +340,7 @@ def train_logistic_regression(experiment_id):
         # Save model to local file
         os.makedirs('saved_models', exist_ok=True)
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        model_filename = f'saved_models/logistic_regression_model_{timestamp}.pkl'
+        model_filename = f'saved_models/basic_logistic_regression_model_{timestamp}.pkl'
         
         joblib.dump(model, model_filename)
         print(f"✅ Model saved locally to: {model_filename}")
