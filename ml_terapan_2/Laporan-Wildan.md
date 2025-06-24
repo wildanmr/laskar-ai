@@ -48,6 +48,8 @@ Untuk Collaborative Filtering, `userId` dan `movieId` dipetakan ke ID internal y
 Matriks interaksi `user-item` dibuat menggunakan `csr_matrix` dari `scipy.sparse`. Matriks ini merepresentasikan apakah seorang pengguna telah berinteraksi (memberi rating) pada suatu film. Meskipun rating eksplisit tersedia, kami menggunakan pendekatan implisit (interaksi biner) untuk model LightFM dengan `loss=\'warp\'`.
 - **Pembagian Data:** <br>
 Data rating dibagi menjadi set pelatihan (80%) dan set pengujian (20%) untuk evaluasi model yang tepat.
+- **Pra-pemrosesan Genre:**<br>
+  Sebelum melakukan ekstraksi fitur konten, kolom `genres` yang semula berbentuk list diubah terlebih dahulu menjadi string yang dipisahkan oleh tanda "|" agar dapat diproses oleh TF-IDF.
 - **Ekstraksi Fitur Konten:** <br>
 Untuk Content-Based Filtering, genre film diubah menjadi representasi numerik menggunakan TF-IDF Vectorizer. Kemudian, kesamaan kosinus dihitung antar film berdasarkan vektor genre mereka.
 
@@ -329,14 +331,25 @@ Top 10 film serupa:
 - Turbo (2013)
 
 ## 6. Evaluation
-Metrik evaluasi yang digunakan untuk Collaborative Filtering (LightFM) adalah Precision@k dan Recall@k. Precision@k mengukur proporsi item yang direkomendasikan yang relevan di antara k item teratas, sedangkan Recall@k mengukur proporsi item relevan yang berhasil direkomendasikan di antara semua item relevan. Metrik ini dipilih karena relevan untuk sistem rekomendasi, di mana tujuan utamanya adalah menyajikan daftar item yang paling mungkin disukai pengguna.
+Metrik evaluasi yang digunakan untuk Collaborative Filtering (LightFM) adalah **Precision\@k** dan **Recall\@k**.
+* **Precision\@k** mengukur proporsi item yang direkomendasikan yang relevan di antara *k* item teratas.
+* **Recall\@k** mengukur proporsi item relevan yang berhasil direkomendasikan di antara semua item relevan.
+  Metrik ini dipilih karena relevan untuk sistem rekomendasi, di mana tujuan utamanya adalah menyajikan daftar item yang paling mungkin disukai pengguna.
 
-Untuk Content-Based Filtering, evaluasi dilakukan secara kualitatif dengan memeriksa relevansi rekomendasi berdasarkan genre. Karena sifatnya yang berbasis konten, metrik kuantitatif seperti Precision/Recall kurang relevan tanpa adanya data eksplisit tentang preferensi genre pengguna.
+**Hasil Evaluasi Collaborative Filtering (LightFM):**
+* **Train Precision\@k:** 0.4628
+* **Test Precision\@k:** 0.0952
+* **Train Recall\@k:** 0.0718
+* **Test Recall\@k:** 0.0628
+
+Hasil evaluasi menunjukkan bahwa model LightFM bekerja cukup baik dalam mempelajari pola dari data pelatihan, tetapi performanya menurun pada data pengujian. Hal ini menunjukkan kemungkinan adanya overfitting atau data pengujian yang sangat berbeda distribusinya. Meski demikian, nilai recall pada data pengujian tetap menunjukkan kemampuan model untuk menangkap sebagian item relevan.
+
+Untuk **Content-Based Filtering**, evaluasi dilakukan secara kualitatif dengan memeriksa relevansi rekomendasi berdasarkan kesamaan genre. Karena sifatnya yang berbasis konten, metrik kuantitatif seperti Precision/Recall kurang relevan tanpa adanya data eksplisit tentang preferensi genre pengguna.
 
 **Perbandingan Algoritma:**
-- **Collaborative Filtering (LightFM):**<br>
-Mampu menemukan rekomendasi yang tidak terduga (serendipitous) karena tidak hanya bergantung pada atribut item, tetapi juga pada perilaku pengguna lain. Namun, mungkin mengalami masalah cold-start untuk pengguna atau item baru yang belum memiliki interaksi yang cukup.
-- **Content-Based Filtering:**<br>
-Sangat baik dalam merekomendasikan item yang serupa dengan yang sudah disukai pengguna. Tidak mengalami masalah cold-start untuk item baru jika atribut kontennya tersedia. Namun, mungkin kurang mampu memberikan rekomendasi yang beragam atau tidak terduga karena terbatas pada atribut konten yang ada.
+* **Collaborative Filtering (LightFM):**<br>
+  Mampu menemukan rekomendasi yang tidak terduga (*serendipitous*) karena mempertimbangkan perilaku pengguna lain. Namun, dapat menghadapi masalah *cold-start* pada pengguna atau item baru yang belum memiliki cukup interaksi.
+* **Content-Based Filtering:**<br>
+  Unggul dalam merekomendasikan item yang mirip dengan yang sebelumnya disukai oleh pengguna. Tidak mengalami *cold-start* untuk item baru jika atribut kontennya tersedia. Namun, bisa kurang variatif karena hanya merekomendasikan item yang mirip dari sisi konten.
 
-Kedua algoritma memiliki kelebihan dan kekurangannya masing-masing, dan pilihan terbaik seringkali tergantung pada kasus penggunaan spesifik dan ketersediaan data.
+Kedua algoritma memiliki kekuatan dan keterbatasannya masing-masing. Dalam praktiknya, pendekatan **hybrid** yang menggabungkan keduanya sering digunakan untuk mengatasi kelemahan masing-masing metode.
