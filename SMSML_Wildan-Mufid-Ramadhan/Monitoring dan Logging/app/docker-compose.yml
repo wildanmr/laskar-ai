@@ -1,41 +1,109 @@
 version: '3.8'
 
 services:
-  
+  # ML Model Service
+  ml-model:
+    image: wildanmr/diabetes-ml-mlflow:v1.1.0-alpha.16
+    ports:
+      - "8080:8080"  # Main API
+      - "8082:8082"  # Prometheus Metrics
+      - "8081:8081"  # gRPC (optional)
+    networks:
+      - monitoring-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Prometheus Exporter (Custom Metrics)
+  prometheus-exporter:
+    build:
+      context: .
+      dockerfile: Dockerfile.exporter
+    ports:
+      - "8000:8000"
+    networks:
+      - monitoring-network
+    depends_on:
+      - ml-model
+    environment:
+      - ML_MODEL_URL=http://ml-model:8080
+
+  # Prometheus
   prometheus:
     image: prom/prometheus:latest
-    restart: unless-stopped
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
     networks:
-      - model-network
+      - monitoring-network
+    depends_on:
+      - prometheus-exporter
 
-# Grafana service
+  # Grafana
   grafana:
     image: grafana/grafana:latest
-    restart: unless-stopped
     ports:
-      - "4000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-      # Enable alerting
-      - GF_ALERTING_ENABLED=false
-      - GF_UNIFIED_ALERTING_ENABLED=true
-      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
-    networks:
-      - model-network
-    depends_on:
-      - prometheus
+      - "3000:3000"
     volumes:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
       - ./grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    networks:
+      - monitoring-network
+    depends_on:
+      - prometheus
+
+  # Node Exporter untuk system metrics
+  node-exporter:
+    image: prom/node-exporter:latest
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - monitoring-network
+
+  # cAdvisor untuk container metrics
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    ports:
+      - "8081:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    privileged: true
+    devices:
+      - /dev/kmsg
+    networks:
+      - monitoring-network
 
 networks:
-  model-network:
+  monitoring-network:
     driver: bridge
 
 volumes:
