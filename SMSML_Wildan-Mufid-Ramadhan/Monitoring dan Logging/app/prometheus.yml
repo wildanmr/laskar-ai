@@ -1,0 +1,44 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # MLflow Built-in Prometheus Metrics (REAL METRICS!)
+  - job_name: 'mlflow-metrics'
+    static_configs:
+      - targets: ['ml-model:8082']
+    scrape_interval: 5s
+    metrics_path: /metrics
+
+  # ML Model Custom Metrics (Additional)
+  - job_name: 'ml-model-custom-metrics'
+    static_configs:
+      - targets: ['prometheus-exporter:8000']
+    scrape_interval: 5s
+    metrics_path: /metrics
+
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Node Exporter (System Metrics)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # cAdvisor (Container Metrics)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  # ML Model REST API Health
+  - job_name: 'ml-model-api'
+    static_configs:
+      - targets: ['ml-model:8080']
+    metrics_path: /health
+    scrape_interval: 10s
