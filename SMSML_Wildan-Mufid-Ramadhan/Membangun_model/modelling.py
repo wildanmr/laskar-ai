@@ -122,16 +122,10 @@ def log_additional_metrics(y_true, y_pred, y_pred_proba=None):
         recall = recall_score(y_true, y_pred, average='weighted', zero_division=0)
         f1 = f1_score(y_true, y_pred, average='weighted', zero_division=0)
         
-        # Log metrics
-        mlflow.log_metric("precision_weighted", precision)
-        mlflow.log_metric("recall_weighted", recall)
-        mlflow.log_metric("f1_weighted", f1)
-        
         # ROC AUC if probabilities are available
         if y_pred_proba is not None and len(np.unique(y_true)) == 2:
             try:
                 roc_auc = roc_auc_score(y_true, y_pred_proba[:, 1])
-                mlflow.log_metric("roc_auc", roc_auc)
                 print(f"✅ ROC AUC: {roc_auc:.4f}")
             except Exception as e:
                 print(f"Warning: Could not calculate ROC AUC: {e}")
@@ -190,9 +184,6 @@ def train_basic_model(experiment_id):
             "timestamp": datetime.now().isoformat()
         })
         
-        # Log metrics manually
-        mlflow.log_metric("accuracy", accuracy)
-        
         # Log additional metrics
         additional_metrics = log_additional_metrics(y_test, y_pred, y_pred_proba)
         
@@ -216,21 +207,6 @@ def train_basic_model(experiment_id):
             print("✅ Classification report logged")
         except Exception as e:
             print(f"Warning: Could not log classification report: {e}")
-        
-        # Log model (single model only)
-        try:
-            input_example = X_train.head(1) if hasattr(X_train, 'head') else X_train[:1]
-            
-            # Log model without registering to avoid duplicates
-            mlflow.sklearn.log_model(
-                sk_model=model,
-                artifact_path="random_forest_model",
-                input_example=input_example
-            )
-            print("✅ Random Forest model logged to MLflow")
-            
-        except Exception as e:
-            print(f"Error: Could not log model: {e}")
         
         print(f"✅ Random Forest model trained successfully!")
         print(f"   Test Accuracy: {accuracy:.4f}")
@@ -291,9 +267,6 @@ def train_logistic_regression(experiment_id):
             "timestamp": datetime.now().isoformat()
         })
         
-        # Log metrics manually
-        mlflow.log_metric("accuracy", accuracy)
-        
         # Log additional metrics
         additional_metrics = log_additional_metrics(y_test, y_pred, y_pred_proba)
         
@@ -317,22 +290,7 @@ def train_logistic_regression(experiment_id):
             print("✅ Classification report logged")
         except Exception as e:
             print(f"Warning: Could not log classification report: {e}")
-        
-        # Log model (single model only)
-        try:
-            input_example = X_train.head(1) if hasattr(X_train, 'head') else X_train[:1]
-            
-            # Log model without registering to avoid duplicates
-            mlflow.sklearn.log_model(
-                sk_model=model,
-                artifact_path="logistic_regression_model",
-                input_example=input_example
-            )
-            print("✅ Logistic Regression model logged to MLflow")
-            
-        except Exception as e:
-            print(f"Error: Could not log model: {e}")
-        
+
         print(f"✅ Logistic Regression trained successfully!")
         print(f"   Test Accuracy: {accuracy:.4f}")
         print(f"   MLflow Run ID: {run.info.run_id}")

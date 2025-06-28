@@ -1,0 +1,15 @@
+artifact_uri: file:///c:/Dev/laskar-ai/SMSML_Wildan-Mufid-Ramadhan/Membangun_model/mlruns/981798115098280773/15935dd39f3247528ccd94ede3868caa/artifacts
+end_time: 1751115237596
+entry_point_name: ''
+experiment_id: '981798115098280773'
+lifecycle_stage: active
+run_id: 15935dd39f3247528ccd94ede3868caa
+run_name: RandomForest_Basic
+run_uuid: 15935dd39f3247528ccd94ede3868caa
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1751115161121
+status: 3
+tags: []
+user_id: wmr
