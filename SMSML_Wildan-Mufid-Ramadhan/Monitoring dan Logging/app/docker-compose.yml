@@ -3,11 +3,10 @@ version: '3.8'
 services:
   # ML Model Service
   ml-model:
-    image: wildanmr/diabetes-ml-mlflow:v1.1.0-alpha.16
+    image: wildanmr/diabetes-ml-mlflow
     ports:
       - "8080:8080"  # Main API
       - "8082:8082"  # Prometheus Metrics
-      - "8081:8081"  # gRPC (optional)
     networks:
       - monitoring-network
     healthcheck:
@@ -15,6 +14,30 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+
+  # Streamlit Inference UI
+  streamlit-inference:
+    build:
+      context: .
+      dockerfile: Dockerfile.inference
+    ports:
+      - "8501:8501"
+    networks:
+      - monitoring-network
+    depends_on:
+      - ml-model
+    environment:
+      - ML_MODEL_URL=http://ml-model:8080
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+    volumes:
+      - streamlit-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   # Prometheus Exporter (Custom Metrics)
   prometheus-exporter:
@@ -109,3 +132,4 @@ networks:
 volumes:
   prometheus-data:
   grafana-data:
+  streamlit-data:
