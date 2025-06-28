@@ -154,8 +154,8 @@ def train_basic_model(experiment_id):
     # Load data
     X_train, X_test, y_train, y_test = load_and_prepare_data()
     
-    # Disable autolog to have full control
-    mlflow.sklearn.autolog(disable=True)
+    # Enable autolog to have full control
+    mlflow.sklearn.autolog(disable=False)
     
     with mlflow.start_run(experiment_id=experiment_id, run_name="RandomForest_Basic") as run:
         print(f"✅ Started MLflow run: {run.info.run_id}")
