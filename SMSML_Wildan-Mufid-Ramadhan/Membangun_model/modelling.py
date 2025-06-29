@@ -172,18 +172,6 @@ def train_basic_model(experiment_id):
         # Calculate accuracy
         accuracy = accuracy_score(y_test, y_pred)
         
-        # Log parameters manually
-        mlflow.log_params({
-            "model_type": "RandomForestClassifier",
-            "n_estimators": 100,
-            "max_depth": 10,
-            "random_state": 42,
-            "train_size": len(X_train),
-            "test_size": len(X_test),
-            "n_features": X_train.shape[1],
-            "timestamp": datetime.now().isoformat()
-        })
-        
         # Log additional metrics
         additional_metrics = log_additional_metrics(y_test, y_pred, y_pred_proba)
         
@@ -256,16 +244,6 @@ def train_logistic_regression(experiment_id):
         accuracy = accuracy_score(y_test, y_pred)
         
         # Log parameters manually
-        mlflow.log_params({
-            "model_type": "LogisticRegression",
-            "random_state": 42,
-            "max_iter": 1000,
-            "train_size": len(X_train),
-            "test_size": len(X_test),
-            "n_features": X_train.shape[1],
-            "feature_scaling": "StandardScaler",
-            "timestamp": datetime.now().isoformat()
-        })
         
         # Log additional metrics
         additional_metrics = log_additional_metrics(y_test, y_pred, y_pred_proba)
