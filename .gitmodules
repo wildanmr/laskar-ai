@@ -4,3 +4,6 @@
 [submodule "SMSML_Wildan-Mufid-Ramadhan/Eksperimen_SML_WorkflowCI_Wildan-Mufid-Ramadhan"]
 	path = SMSML_Wildan-Mufid-Ramadhan/Eksperimen_SML_WorkflowCI_Wildan-Mufid-Ramadhan
 	url = https://github.com/wildanmr/Eksperimen_SML_WorkflowCI_Wildan-Mufid-Ramadhan.git
+[submodule "ds_2/app"]
+	path = ds_2/app
+	url = https://github.com/wildanmr/StudentPerformance-App.git
